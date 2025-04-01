@@ -19,3 +19,9 @@
 1. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
 2. `scrapy crawl dbpia -O csv/dbpia.csv`: dbpia 크롤링 + csv로 저장
 3. `scrapy crawl riss -O csv/riss.csv`: riss 크롤링 + csv로 저장
+
+
+# 코드
+https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/dbpia.py
+https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/riss.py
+https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/pipeline.py
