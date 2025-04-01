@@ -22,6 +22,6 @@
 
 
 # 코드
-https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/dbpia.py
-https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/riss.py
-https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/pipeline.py
+- https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/dbpia.py
+- https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/spiders/riss.py
+- https://github.com/kbs-kbs/2025-1-NLP-Crawler/blob/main/scrpy_plwrt_demo/pipeline.py
