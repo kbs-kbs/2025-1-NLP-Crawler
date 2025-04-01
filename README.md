@@ -1,3 +1,5 @@
+![python](https://img.shields.io/badge/python-3.13.2-blue)
+
 # Scrapy-playwright를 통한 dbpia 및 riss 크롤링 도구
 - 셀레니움보다 훨씬 간결한 코드 사용 가능
 - splash 서버를 이용하는 것보다 간편하게 사용 가능
