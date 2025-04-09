@@ -19,9 +19,21 @@ git clone https://github.com/kbs-kbs/2025-1-NLP-Crawler.git
 5. `pip3.13 install -r requirements.txt`
 6. `playwright install`
 
+# 또는
+1. `pip install uv`
+2. `uv init`
+2. `uv venv --python 3.13.2`
+3. `.venv\Scripts\activate`
+4. `uv pip install -r requirements.txt`: 편집기 설정에 구애받지 않고 venv에 설치됨
+5. `playwright install`
+
+
 # 환경 설정 및 실행
 1. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
 2. `python pipeline.py`: 실행
+
+# 또는
+1. `uv run pipeline.py`: 가상환경 활성화 없이도 프로젝트 venv을 자동으로 인식하여 실행
 
 # 도메인별로 따로 실행
 1. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
