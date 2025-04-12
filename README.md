@@ -1,4 +1,4 @@
-![python](https://img.shields.io/badge/python-3.13.2-blue)
+![python](https://img.shields.io/badge/python-3.12.10-blue)
 
 # Scrapy-playwright를 통한 dbpia 및 riss 크롤링 도구
 - 셀레니움보다 훨씬 간결한 코드 사용 가능
@@ -11,21 +11,25 @@
 git clone https://github.com/kbs-kbs/2025-1-NLP-Crawler.git
 ```
 
-# 최초 환경 설정
-1. `winget install --id=Python.Python.3.13 -e`
-2. `configurator.bat`
+# 초기 환경 설정
+## 최소 의존성 설치
+1. 파이썬 3.12.10 설치 (Winget):
+   - `winget install --id=Python.Python.3.13 -e`
+2. `temp\configurator.bat`
 3. `python3.13 -m venv venv`
-4. `venv\Scripts\activate` 및 편집기에서 가상환경 활성화
+4. `venv\Scripts\activate` 및 편집기에서 가상 환경 활성화
 5. `pip3.13 install -r requirements.txt`
 6. `playwright install`
 
-# 또는
-1. `pip install uv`
-2. `uv init`
-2. `uv venv --python 3.13.2`
-3. `.venv\Scripts\activate`
-4. `uv pip install -r requirements.txt`: 편집기 설정에 구애받지 않고 venv에 설치됨
-5. `playwright install`
+## 권장 설치
+1. uv 설치 (Powershell):
+   - `Set-ExecutionPolicy RemoteSigned Process`
+   - `irm https://astral.sh/uv/install.ps1 | iex`
+2. `uv init --python 3.12`
+4. `uv venv`
+5. `uv add -r requirements.txt`
+6. `uv sync`
+7. `playwright install`
 
 
 # 환경 설정 및 실행
