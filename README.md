@@ -25,10 +25,7 @@ git clone https://github.com/kbs-kbs/2025-1-NLP-Crawler.git
 1. uv 설치 (Powershell):
    - `Set-ExecutionPolicy RemoteSigned Process`
    - `irm https://astral.sh/uv/install.ps1 | iex`
-2. `uv init --python 3.12`
-4. `uv venv`
-5. `uv add -r requirements.txt`
-6. `uv sync`
+2. `uv init --p 3.12`
 7. `playwright install`
 
 

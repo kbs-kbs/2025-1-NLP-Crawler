@@ -72,7 +72,7 @@ class RissSpider(scrapy.Spider):
                 abstract = item.css(f'div.cont > p.preAbstract::text').get()
                 thesis['abstract'] = abstract.replace('\n', '').replace('\t', '').replace('\r', '') if abstract else None
                 thesis['link'] = 'https://www.riss.kr' + item.css(f'div.cont > p.title > a::attr(href)').get()
-                self.inform('제목', thesis['title'], '발행 연도', thesis['issue_year'], '초록', thesis['abstract'], '링크', thesis['link'])
+                # self.inform('제목', thesis['title'], '발행 연도', thesis['issue_year'], '초록', thesis['abstract'], '링크', thesis['link'])
 
                 yield thesis
 

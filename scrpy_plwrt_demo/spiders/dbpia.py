@@ -24,7 +24,7 @@ class DbpiaSpider(scrapy.Spider):
                 "playwright": True, # Playwright 활성화
                 "playwright_include_page": True, # 페이지 객체 포함
                 "playwright_page_methods": [
-                    PageMethod("wait_for_selector", "#totalCount") # 총 논문 수 요소 대기
+                    PageMethod("wait_for_selector", "#search-result-total-count > strong") # 총 논문 수 요소 대기
                 ],
                 "playwright_page_goto_kwargs": {
                     "timeout": 200000, # 페이지 로딩 타임아웃 200초
@@ -36,7 +36,7 @@ class DbpiaSpider(scrapy.Spider):
 
     async def parse_node_count(self, response):
         # 총 논문 수 파싱
-        node_count = int(response.css('#totalCount::text').get().replace('건', '').replace(',', ''))
+        node_count = int(response.css('#search-result-total-count > strong::text').get().replace(',', ''))
         self.inform('논문 개수', node_count)
 
         page = response.meta["playwright_page"]
@@ -45,11 +45,11 @@ class DbpiaSpider(scrapy.Spider):
         elif node_count > 20:
             # 100개씩 보기 설정 (페이지네이션 최적화)
             self.max_pages = math.ceil(node_count/100)
-            await page.wait_for_selector('#selectWrapper')
-            element = await page.query_selector('#selectWrapper')
+            await page.wait_for_selector('#page-size-btn')
+            element = await page.query_selector('#page-size-btn')
             await element.click() # 페이지당 표시 수 드롭다운 클릭
-            await page.wait_for_selector('#get100PerPage')
-            element = await page.query_selector('#get100PerPage')
+            await page.wait_for_selector('#sort-page-size-section > div > ul > li:nth-of-type(4) > button')
+            element = await page.query_selector('#sort-page-size-section > div > ul > li:nth-of-type(4) > button')
             await element.click() # 100개 선택
         else:
             self.max_pages = 1
@@ -104,7 +104,7 @@ class DbpiaSpider(scrapy.Spider):
 
     def parse_node_ids(self, response):
         # 노드 ID 추출 및 페이지 완료 카운트
-        self.node_ids += response.css('#searchResultList section.thesisAdditionalInfo.thesis__info::attr(data-nodeid)').getall()
+        self.node_ids += [item.replace('search-article-', '') for item in response.css('#paper-cards-section > div::attr(id)').getall()]
         self.pages_crawled += 1
         self.inform('완료한 페이지', self.pages_crawled, '노드 리스트', self.node_ids)
 
