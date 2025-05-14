@@ -20,13 +20,25 @@ git clone https://github.com/kbs-kbs/2025-1-NLP-Crawler.git
 4. `venv\Scripts\activate` 및 편집기에서 가상 환경 활성화
 5. `pip3.13 install -r requirements.txt`
 6. `playwright install`
+2. `uv init --p 3.12`
+
 
 ## 권장 설치
 1. uv 설치 (Powershell):
-   - `Set-ExecutionPolicy RemoteSigned Process`
-   - `irm https://astral.sh/uv/install.ps1 | iex`
-2. `uv init --p 3.12`
-7. `playwright install`
+   ```
+   Set-ExecutionPolicy RemoteSigned Process
+   ```
+   ```
+   irm https://astral.sh/uv/install.ps1 | iex
+   ```
+2. 의존성 설치 (CMD):
+   ```
+   uv sync
+   ```
+3. scrapy playwright 설치 (CMD):
+   ```
+   uv run playwright install
+   ```
 
 
 # 환경 설정 및 실행
