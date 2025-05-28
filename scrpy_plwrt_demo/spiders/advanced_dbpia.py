@@ -4,14 +4,14 @@ import time # 실행 시간 측정용
 import math # 페이지 계산용
 from scrpy_plwrt_demo.items import ThesisItem # 데이터 저장을 위한 아이템 클래스
 
-class DbpiaSpider(scrapy.Spider):
-    name = 'dbpia' # 스파이더 이름
+class AdvancedDbpiaSpider(scrapy.Spider):
+    name = 'advanced_dbpia' # 스파이더 이름
     allowed_domains = ['www.dbpia.co.kr'] # 허용 도메인
 
-    def __init__(self, keyword, *args, **kwargs):
+    def __init__(self, category='NE08', *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.query = keyword # 사용자 검색어
-        self.node_ids = [] # 수집할 논문 노드 ID 저장 리스트
+        self.category = category
+        self.thesis_paths = []
         self.max_pages = 0 # 최대 페이지 수
         self.pages_crawled = 0 # 현재 크롤링 완료 페이지 수
         self.start_time = time.time() # 실행 시작 시간 기록
@@ -19,7 +19,7 @@ class DbpiaSpider(scrapy.Spider):
     def start_requests(self):
         # 초기 요청 생성 (Playwright 설정 포함)
         yield scrapy.Request(
-            url=f'https://www.dbpia.co.kr/search/topSearch?collectionQuery=%28%3CTITLE%3Acontains%3A%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%3E+%7C+%3CNODE_NM_2%3Acontains%3A%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%3E%29+%7C+%28%3CTITLE%3Acontains%3Aai%3E+%7C+%3CNODE_NM_2%3Acontains%3Aai%3E%29+%7C+%28%3CTITLE%3Acontains%3A%EB%94%A5%EB%9F%AC%EB%8B%9D%3E+%7C+%3CNODE_NM_2%3Acontains%3A%EB%94%A5%EB%9F%AC%EB%8B%9D%3E%29+%7C+%28%3CTITLE%3Acontains%3A%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D%3E+%7C+%3CNODE_NM_2%3Acontains%3A%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D%3E%29+%7C+&filter=&prefix=&subjectCategory=NE08',
+            url=f'https://www.dbpia.co.kr/search/topSearch?collectionQuery=(<TITLE:contains:인공지능>|<NODE_NM_2:contains:인공지능>)|(<TITLE:contains:ai> | <NODE_NM_2:contains:ai>) | (<TITLE:contains:딥러닝> | <NODE_NM_2:contains:딥러닝>)|(<TITLE:contains:머신러닝>|<NODE_NM_2:contains:머신러닝>)|&filter=&prefix=&subjectCategory={self.category}',
             meta={
                 "playwright": True, # Playwright 활성화
                 "playwright_include_page": True, # 페이지 객체 포함
@@ -65,7 +65,7 @@ class DbpiaSpider(scrapy.Spider):
                 encoding="utf-8",
                 request=response.request
             )
-            self.parse_node_ids(new_response) # 노드 ID 추출
+            self.parse_thesis_paths(new_response)
 
             if self.pages_crawled < self.max_pages:
                 await self.click_next_button(page) # 다음 페이지 버튼 클릭
@@ -74,46 +74,31 @@ class DbpiaSpider(scrapy.Spider):
             else: break
         
         # 수집된 노드 ID 기반 상세 페이지 요청 생성
-        for node_id in self.node_ids:
-            if 'NODE' in node_id:
-                yield scrapy.Request( # 학술지 세부 페이지 요청
-                    url=f'https://www.dbpia.co.kr/journal/articleDetail?nodeId={node_id}',
-                    meta={
-                        "playwright": True,
-                        "playwright_include_page": True,
-                        "playwright_page_goto_kwargs": {
-                            "timeout": 200000,
-                            "wait_until": "domcontentloaded"
-                        }
-                    },
-                    callback=self.parse_article_detail_page
-                )
-            else:
-                yield scrapy.Request( # 일반 세부 페이지 요청
-                    url=f'https://www.dbpia.co.kr/journal/detail?nodeId={node_id}',
-                    meta={
-                        "playwright": True,
-                        "playwright_include_page": True,
-                        "playwright_page_goto_kwargs": {
-                            "timeout": 200000,
-                            "wait_until": "domcontentloaded"
-                        }
-                    },
-                    callback=self.parse_detail_page
-                )
+        for thesis_path in self.thesis_paths:
+            yield scrapy.Request( # 학술지 세부 페이지 요청
+                url='https://www.dbpia.co.kr' + thesis_path,
+                meta={
+                    "playwright": True,
+                    "playwright_include_page": True,
+                    "playwright_page_goto_kwargs": {
+                        "timeout": 200000,
+                        "wait_until": "domcontentloaded"
+                    }
+                },
+                callback=self.parse_article_detail_page
+            )
 
-    def parse_node_ids(self, response):
-        # 노드 ID 추출 및 페이지 완료 카운트
-        self.node_ids += [item.replace('search-article-', '') for item in response.css('#paper-cards-section > div::attr(id)').getall()]
+    def parse_thesis_paths(self, response):
+        self.thesis_paths += response.css('#paper-cards-section > div.thesisCard__cont > p.thesis__subject > a::attr(href)').getall()
         self.pages_crawled += 1
-        self.inform('완료한 페이지', self.pages_crawled, '노드 리스트', self.node_ids)
+        self.inform('완료한 페이지', self.pages_crawled, '패스 리스트', self.thesis_paths)
 
     async def click_next_button(self, page):
         # 페이지네이션 버튼 클릭 로직
         if self.pages_crawled%10 < 10:
-            next_button = await page.query_selector(f'#pageList a:nth-child({self.pages_crawled%10 + 2})')
+            next_button = await page.query_selector(f'#pagination-section > div > a:nth-child({self.pages_crawled%10 + 2})')
         else:
-            next_button = await page.query_selector('#goNextPage')
+            next_button = await page.query_selector('#pagination-section > div > a.arrow.next')
         await next_button.click()
 
     async def parse_article_detail_page(self, response):
